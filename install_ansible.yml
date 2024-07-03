@@ -1,0 +1,9 @@
+---
+- hosts: localhost
+  become: true
+  roles:
+    - {role: nginx, tags: nginx}
+    - {role: php, tags: php}
+    - {role: wp-cli, tags: wp-cli}
+    - {role: mariadb, tags: mariadb}
+    - {role: wordpress, tags: wordpress}

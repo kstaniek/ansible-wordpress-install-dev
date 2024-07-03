@@ -1,0 +1,68 @@
+---
+- name: Install repo  software packages
+  become: true
+  apt: name={{item}} state=present
+  with_items:
+    - software-properties-common
+    - dirmngr
+    - apt-transport-https
+
+- name: Add MariaDB Repository key
+  become: true
+  apt_key:
+    url: "https://mariadb.org/mariadb_release_signing_key.asc"
+    state: present
+
+- name: Add MariaDB Repository
+  become: true
+  apt_repository:
+    repo: "deb [arch=amd64,arm64,ppc64el] https://mirror.klaus-uwe.me/mariadb/repo/11.2/ubuntu  {{ ansible_distribution_release }} main"
+    state: present  
+
+- name: Install MariaDB server
+  become: true
+  apt: name={{item}} state=present
+  with_items:
+    - mariadb-server
+    - mariadb-common
+    - python3-openssl
+    - python3-mysqldb
+
+# - name: Make MariaDB server file configuration
+#   become: true
+#   template:
+#     src: server.cnf.j2
+#     dest: /etc/mysql/mariadb.cnf
+#   notify: restart mariadb server
+
+- name: Create log directory
+  become: true
+  file:
+    state: directory
+    path: /var/log/mariadb
+    owner: mysql
+    group: mysql
+    mode: 0765
+
+- name: Configure MariaDB logrotate
+  become: true
+  template:
+    src: mariadb_logrotate.j2
+    dest: /etc/logrotate.d/mysql
+  notify: restart mariadb server
+
+- name: Create Wordpress Database
+  mysql_db:
+    name: "{{wp_db}}"
+    encoding: "utf8mb4"
+    collation: "utf8mb4_unicode_ci"
+    state: present
+
+- name: Create user
+  mysql_user:
+    name: "{{wp_user}}"
+    password: "{{wp_password}}"
+    priv: "{{wp_db}}.*:ALL"
+    column_case_sensitive: true
+    state: present
+

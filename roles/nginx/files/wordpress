@@ -1,0 +1,28 @@
+server {
+    listen 80;
+    listen [::]:80;
+    http2 on;
+
+    server_name localhost;
+    root /home/klstanie/wordpress;
+
+    # access_log <full path>;
+    # error_log <full path>;
+
+    location /wp {
+        index index.php;
+        try_files $uri $uri/ /wp/index.php?$args;
+    }
+
+    # location / {
+    #     try_files $uri $uri/ /index.php?$args;
+    # }
+
+    location ~ \.php$ {
+        try_files $uri =404;
+        fastcgi_split_path_info ^(.+\.php)(/.+)$;
+        fastcgi_pass unix:/run/php/php8.3-fpm.sock;
+        fastcgi_index index.php;
+        include fastcgi.conf;
+    }
+}

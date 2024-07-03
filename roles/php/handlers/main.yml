@@ -1,0 +1,6 @@
+---
+- name: restart php fpm service
+  systemd:
+    name: php8.3-fpm
+    state: restarted
+    enabled: yes

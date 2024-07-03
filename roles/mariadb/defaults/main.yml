@@ -1,0 +1,4 @@
+---
+mariadb_logrotate:
+  rotate: "7"
+  rotation: daily

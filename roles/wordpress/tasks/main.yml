@@ -1,0 +1,19 @@
+---
+- name: Create Folder
+  file:
+    path: "{{wp_path}}"
+    state: directory
+  become: true
+  become_user: "{{ansible_env.SUDO_USER}}"
+- name: Download WP
+  shell: 
+    cmd: "wp core download"
+    chdir: "{{wp_path}}"
+  become: true
+  become_user: "{{ansible_env.SUDO_USER}}"
+- name: Configure WP
+  shell: 
+    cmd: "wp core config --dbname={{wp_db}} --dbuser={{wp_user}} --dbpass='{{wp_password}}'"
+    chdir: "{{wp_path}}"
+  become: true
+  become_user: "{{ansible_env.SUDO_USER}}"
